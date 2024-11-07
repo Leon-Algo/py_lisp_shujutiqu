@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from ast import literal_eval
+import os
 
 def process_coordinates(coord_str):
     """处理坐标字符串，转换为元组"""
@@ -26,8 +27,8 @@ def match_numbers_to_devices(devices_df, numbers_df):
     devices_df['数量文本坐标'] = ''
     
     # 处理坐标字符串
-    devices_df['coordinates'] = devices_df.iloc[:, 2].apply(process_coordinates)  # 使用第三列作为坐标
-    numbers_df['coordinates'] = numbers_df.iloc[:, 1].apply(process_coordinates)  # 使用第二列作为坐标
+    devices_df['coordinates'] = devices_df.iloc[:, 2].apply(process_coordinates)
+    numbers_df['coordinates'] = numbers_df.iloc[:, 1].apply(process_coordinates)
     
     def extract_number(text):
         try:
@@ -39,7 +40,7 @@ def match_numbers_to_devices(devices_df, numbers_df):
         except:
             return 1
 
-    numbers_df['数值'] = numbers_df.iloc[:, 0].apply(extract_number)  # 使用第一列作为数量文本
+    numbers_df['数值'] = numbers_df.iloc[:, 0].apply(extract_number)
     
     # 为每个数量文本找到最近的设备
     for idx, number_row in numbers_df.iterrows():
@@ -73,32 +74,39 @@ def match_numbers_to_devices(devices_df, numbers_df):
     
     return devices_df
 
-def main():
+def process_data():
+    """
+    处理CSV数据的主函数
+    """
     try:
-        # 读取CSV文件并显示前几行数据
-        devices_df = pd.read_csv('devices.csv', encoding='gbk')
-        numbers_df = pd.read_csv('numbers.csv', encoding='gbk')
+        # 修改CSV文件读取路径
+        csv_path = "e:\\temp\\"
+        devices_df = pd.read_csv(os.path.join(csv_path, 'devices.csv'), encoding='gbk')
+        numbers_df = pd.read_csv(os.path.join(csv_path, 'numbers.csv'), encoding='gbk')
         
-        print("\n设备表前几行:")
-        print(devices_df.head())
-        print("\n数量表前几行:")
-        print(numbers_df.head())
+        print("\n读取到的数据概况：")
+        print(f"设备表：{len(devices_df)}行")
+        print(f"数量表：{len(numbers_df)}行")
         
         # 处理数据
         result_df = match_numbers_to_devices(devices_df, numbers_df)
         
-        # 保存结果
+        # 保存结果到当前目录
         result_df.to_csv('devices_with_quantities.csv', encoding='gbk', index=False)
         print("\n处理完成，结果已保存到 devices_with_quantities.csv")
         
         # 显示结果统计
         print("\n设备数量统计：")
-        print(result_df.groupby(result_df.columns[0])['设备数量'].sum())  # 使用第一列作为设备名称，分组求数量和
+        quantity_stats = result_df.groupby(result_df.columns[0])['设备数量'].sum()
+        print(quantity_stats)
+        
+        return True
         
     except Exception as e:
         print(f"处理过程中出现错误: {str(e)}")
         import traceback
         print(traceback.format_exc())
+        return False
 
 if __name__ == "__main__":
-    main()
+    process_data()
