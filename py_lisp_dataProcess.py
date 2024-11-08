@@ -163,7 +163,7 @@ def process_data():
     处理CSV数据的主函数
     """
     try:
-        # 修改CSV文���读取路径
+        # 修改CSV文件读取路径
         csv_path = "e:\\temp\\"
         devices_df = pd.read_csv(os.path.join(csv_path, 'devices.csv'), encoding='gbk')
         numbers_df = pd.read_csv(os.path.join(csv_path, 'numbers.csv'), encoding='gbk')
@@ -190,15 +190,23 @@ def process_data():
         quantity_stats.columns = ['设备类型', '设备图元(个)', '设备总数']
         
         # 使用ExcelWriter保存多个sheet
-        with pd.ExcelWriter('devices_with_quantities.xlsx', engine='openpyxl') as writer:
+        excel_path = 'devices_with_quantities.xlsx'
+        with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
             result_df.to_excel(writer, sheet_name='设备明细', index=False)
             quantity_stats.to_excel(writer, sheet_name='设备统计', index=False)
         
-        print("\n处理完成，结果已保存到 devices_with_quantities.xlsx")
+        print("\n处理完成，结果已保存到", excel_path)
         
         # 显示结果统计
         print("\n设备数量统计：")
         print(quantity_stats)
+        
+        # 调用格式化函数
+        try:
+            from format_excel import format_excel
+            format_excel(excel_path)
+        except Exception as e:
+            print(f"格式化Excel时出错: {str(e)}")
         
         return True
         
