@@ -31,13 +31,16 @@ def match_numbers_to_devices(devices_df, numbers_df):
     numbers_df['coordinates'] = numbers_df.iloc[:, 1].apply(process_coordinates)
     
     def extract_number(text):
+        """提取数量文本中的数值"""
+        # 移除'X'或'x'或'*'前缀，并尝试转换为整数
         try:
-            # 移除'X'或'x'前缀，并尝试转换为整数
             text = str(text).strip().lower()
-            if text.startswith('x'):
+            if text.startswith('x') or text.startswith('*'):
                 text = text[1:]
-            return int(text)
+            num = int(text)
+            return num
         except:
+            print(f"无法提取数值: {text}, 使用默认值1")
             return 1
 
     numbers_df['数值'] = numbers_df.iloc[:, 0].apply(extract_number)
@@ -65,7 +68,7 @@ def match_numbers_to_devices(devices_df, numbers_df):
                 closest_device_idx = device_idx
         
         # 如果找到最近的设备，更新其数量和对应的数量文本坐标
-        if closest_device_idx is not None and min_distance < 100:
+        if closest_device_idx is not None and min_distance < 1000:
             devices_df.at[closest_device_idx, '设备数量'] = number_value
             devices_df.at[closest_device_idx, '数量文本坐标'] = str(number_coord)
     

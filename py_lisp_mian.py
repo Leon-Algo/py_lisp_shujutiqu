@@ -8,13 +8,17 @@ def open_target_drawing():
 	"""
 	打开目标CAD图纸
 	"""
-	# target_dwg = "P-21040185陕西榆林体育中心及会展中心项目—能耗管理系统.dwg"
-	target_dwg = "P-23040167深圳平湖智造园项目 工厂区电能管理系统图_t3（系统图）.dwg"
+	target_dwg = "P-21040185陕西榆林体育中心及会展中心项目—能耗管理系统.dwg"
+	# target_dwg = "P-23040167深圳平湖智造园项目 工厂区电能管理系统图_t3（系统图）.dwg"
 	
 	try:
 		# 获取当前目录的完整路径
 		current_dir = os.path.abspath(os.path.dirname(__file__))
 		dwg_path = os.path.join(current_dir, target_dwg)
+
+		# 打印当前目录和目标图纸路径
+		print(f"当前目录: {current_dir}")
+		print(f"目标图纸路径: {dwg_path}")
 		
 		if not os.path.exists(dwg_path):
 			print(f"错误：找不到目标图纸 {target_dwg}")
