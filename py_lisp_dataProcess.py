@@ -160,10 +160,10 @@ def match_numbers_to_devices(devices_df, numbers_df):
 
 def process_data():
     """
-    理CSV数据的主函数
+    处理CSV数据的主函数
     """
     try:
-        # 修改CSV文件读取路径
+        # 修改CSV文���读取路径
         csv_path = "e:\\temp\\"
         devices_df = pd.read_csv(os.path.join(csv_path, 'devices.csv'), encoding='gbk')
         numbers_df = pd.read_csv(os.path.join(csv_path, 'numbers.csv'), encoding='gbk')
@@ -185,13 +185,19 @@ def process_data():
         print("\n=== devices_with_quantities.csv 前3行 ===")
         print(result_df.head(3))
         
-        # 保存结果到当前目录
-        result_df.to_csv('devices_with_quantities.csv', encoding='gbk', index=False)
-        print("\n处理完成，结果已保存到 devices_with_quantities.csv")
+        # 计算设备数量统计
+        quantity_stats = result_df.groupby('设备类型')['设备数量'].agg(['count', 'sum']).reset_index()
+        quantity_stats.columns = ['设备类型', '设备图元(个)', '设备总数']
+        
+        # 使用ExcelWriter保存多个sheet
+        with pd.ExcelWriter('devices_with_quantities.xlsx', engine='openpyxl') as writer:
+            result_df.to_excel(writer, sheet_name='设备明细', index=False)
+            quantity_stats.to_excel(writer, sheet_name='设备统计', index=False)
+        
+        print("\n处理完成，结果已保存到 devices_with_quantities.xlsx")
         
         # 显示结果统计
         print("\n设备数量统计：")
-        quantity_stats = result_df.groupby(result_df.columns[0])['设备数量'].sum()
         print(quantity_stats)
         
         return True
